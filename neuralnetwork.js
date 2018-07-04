@@ -50,7 +50,7 @@ function Nn(inputno, hiddenno, outputno)
 
   this.train = function(inputs, targets)
   {
-    //Displaying the weights initially
+    //Displaying changes
     this.weights_ih.print();
     this.weights_ho.print();
 
@@ -97,17 +97,21 @@ function Nn(inputno, hiddenno, outputno)
     hidden_inputs.activate();
 
     //Finding change in weights in output, hidden layer
-    var delta_w_ho = Matrix.multiply(error_h, Matrix.transpose(hidden_inputs));
+    outputs.activateder();
+    var gradient_ho = Matrix.hadmardproduct(outputs, error_o);
+    var delta_w_ho = Matrix.multiply(gradient_ho, Matrix.transpose(hidden_inputs));
 
     //Multiplying the change by learning rate
     delta_w_ho.multiplyscaler(this.learning_rate);
     this.weights_ho = Matrix.add(this.weights_ho, delta_w_ho);
 
     //Changing the biases in the output layer
-    error_o.multiplyscaler(this.learning_rate);
-    this.bias_o = Matrix.add(this.bias_o, error_o);
+    gradient_ho.multiplyscaler(this.learning_rate);
+    this.bias_o = Matrix.add(this.bias_o, gradient_ho);
 
     //Computing the change in weights of the input layer
+    hidden_inputs.activateder();
+    var gradient_ih = Matrix.hadmardproduct(hidden_inputs, error_h);
     var delta_w_ih = Matrix.multiply(error_h, Matrix.transpose(inputs));
 
     //Multipling by learning rate
@@ -115,10 +119,10 @@ function Nn(inputno, hiddenno, outputno)
     this.weights_ih = Matrix.add(this.weights_ih, delta_w_ih);
 
     //Changing the biases in the hidden layer
-    error_h.multiplyscaler(this.learning_rate);
-    this.bias_h = Matrix.add(this.bias_h, error_h);
+    gradient_ih.multiplyscaler(this.learning_rate);
+    this.bias_h = Matrix.add(this.bias_h, gradient_ih);
 
-    //Displaying the weights finally after all changes
+    //Displaying changes
     this.weights_ih.print();
     this.weights_ho.print();
   }

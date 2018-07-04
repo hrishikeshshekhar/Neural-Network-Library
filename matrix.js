@@ -127,6 +127,18 @@ function Matrix(rows, cols)
     }
   }
 
+  //Applies activaton function's deriavate
+  this.activateder = function()
+  {
+    for(var i = 0; i < this.rows; ++i)
+    {
+      for(var j = 0; j < this.cols; ++j)
+      {
+        this.matrix[i][j] = this.matrix[i][j] * (1 - this.matrix[i][j]);
+      }
+    }
+  }
+
   //A function to act as a sigmoid function to conform output to a range
   Matrix.sigmoid = function(number)
   {
@@ -157,6 +169,23 @@ function Matrix(rows, cols)
         result.matrix[j][i] = m.matrix[i][j];
       }
     }
+    return result;
+  }
+
+  //A function to perform hadmard product
+  Matrix.hadmardproduct = function(a, b)
+  {
+    var result = new Matrix(a.rows, a.cols);
+    result.setup();
+
+    for(let i = 0; i < a.rows; ++i)
+    {
+      for(let j = 0; j < a.cols; ++j)
+      {
+        result.matrix[i][j] = a.matrix[i][j] * b.matrix[i][j];
+      }
+    }
+
     return result;
   }
 }
