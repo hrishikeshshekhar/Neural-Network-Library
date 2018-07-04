@@ -3,6 +3,7 @@ function Nn(inputno, hiddenno, outputno)
   this.input_nodes = inputno;
   this.hidden_nodes = hiddenno;
   this.output_nodes = outputno;
+  this.learning_rate = 0.1;
   this.weights_ih;
   this.weights_ho;
   this.bias_h;
@@ -49,6 +50,10 @@ function Nn(inputno, hiddenno, outputno)
 
   this.train = function(inputs, targets)
   {
+    //Displaying the weights initially
+    this.weights_ih.print();
+    this.weights_ho.print();
+
     //Creating the output errors
     var error_o = new Matrix(targets.length, 1);
 
@@ -57,28 +62,70 @@ function Nn(inputno, hiddenno, outputno)
     //Converting the output into a matrix
     outputs = Matrix.tomatrix(outputs);
 
+    //Converting the inputs to a matrix
+    inputs = Matrix.tomatrix(inputs);
+
     //Changing the target to a martix
     targets = Matrix.tomatrix(targets);
 
     //Computing the output error
     error_o = Matrix.subtract(targets, outputs);
 
-    //Computing the error of the hidden layer
-    var error_h = new Matrix(this.hidden_nodes, 1);
-    error_h.setup();
+    //Normailzing the weights in the hidden layer
+    var n_weights_ho = new Matrix(this.weights_ho.rows, this.weights_ho.cols);
+    n_weights_ho.setup();
 
-    //Assigning the errors of the hidden layer
-    for(var i = 0; i < this.weights_ho.cols; ++i)
+    //Assigning the normalized weights matrix
+    for(var i = 0; i < n_weights_ho.rows; ++i)
     {
-      //Initializing to 0
-      error_h.matrix[i][0] = 0;
-
-      for(var j = 0; j < this.weights_ho.rows; ++j)
+      var rowsum = this.weights_ho.sumofrow(i);
+      for(var j = 0; j < n_weights_ho.cols; ++j)
       {
-        error_h.matrix[i][0] += error_o.matrix[j] * this.weights_ho.matrix[j][i] / this.weights_ho.sumofrow(j);
+        n_weights_ho.matrix[i][j] = this.weights_ho.matrix[i][j] / rowsum;
       }
     }
-    
 
+    //Transposing this normalised weights matrix
+    var n_weights_ho_t = Matrix.transpose(n_weights_ho);
+
+    //Finding the error in the hidden layer
+    var error_h = Matrix.multiply(n_weights_ho_t, error_o);
+
+    //Computing the change in weights and bias in the hidden layer and assigning them
+    var hidden_inputs = Matrix.multiply(this.weights_ih, inputs);
+    hidden_inputs = Matrix.add(hidden_inputs, this.bias_h);
+    hidden_inputs.activate();
+
+    //Finding change in weights in output, hidden layer
+    var delta_w_ho = Matrix.multiply(error_h, Matrix.transpose(hidden_inputs));
+
+    //Multiplying the change by learning rate
+    delta_w_ho.multiplyscaler(this.learning_rate);
+    this.weights_ho = Matrix.add(this.weights_ho, delta_w_ho);
+
+    //Changing the biases in the output layer
+    error_o.multiplyscaler(this.learning_rate);
+    this.bias_o = Matrix.add(this.bias_o, error_o);
+
+    //Computing the change in weights of the input layer
+    var delta_w_ih = Matrix.multiply(error_h, Matrix.transpose(inputs));
+
+    //Multipling by learning rate
+    delta_w_ih.multiplyscaler(this.learning_rate);
+    this.weights_ih = Matrix.add(this.weights_ih, delta_w_ih);
+
+    //Changing the biases in the hidden layer
+    error_h.multiplyscaler(this.learning_rate);
+    this.bias_h = Matrix.add(this.bias_h, error_h);
+
+    //Displaying the weights finally after all changes
+    this.weights_ih.print();
+    this.weights_ho.print();
+  }
+
+  //Function to predict given neural network
+  this.predict = function(inputs)
+  {
+    return (this.feedforward(inputs));
   }
 }

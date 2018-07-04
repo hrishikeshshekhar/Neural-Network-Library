@@ -77,6 +77,17 @@ function Matrix(rows, cols)
     return result;
   }
 
+  this.multiplyscaler = function(n)
+  {
+    for(var i = 0; i < this.rows; ++i)
+    {
+      for(var j = 0; j < this.cols; ++j)
+      {
+        this.matrix[i][j] *= n;
+      }
+    }
+  }
+
   Matrix.tomatrix = function(array)
   {
     var result = new Matrix(array.length, 1);
@@ -131,5 +142,21 @@ function Matrix(rows, cols)
       sum += this.matrix[j][i];
     }
     return sum;
+  }
+
+  //Function to transpose the matrix
+  Matrix.transpose = function(m)
+  {
+    var result = new Matrix(m.cols, m.rows);
+    result.setup();
+
+    for(var i = 0; i < m.rows; ++i)
+    {
+      for(var j = 0; j < m.cols; ++j)
+      {
+        result.matrix[j][i] = m.matrix[i][j];
+      }
+    }
+    return result;
   }
 }
