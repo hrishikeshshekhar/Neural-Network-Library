@@ -50,10 +50,6 @@ function Nn(inputno, hiddenno, outputno)
 
   this.train = function(inputs, targets)
   {
-    //Displaying changes
-    this.weights_ih.print();
-    this.weights_ho.print();
-
     //Creating the output errors
     var error_o = new Matrix(targets.length, 1);
 
@@ -112,7 +108,7 @@ function Nn(inputno, hiddenno, outputno)
     //Computing the change in weights of the input layer
     hidden_inputs.activateder();
     var gradient_ih = Matrix.hadmardproduct(hidden_inputs, error_h);
-    var delta_w_ih = Matrix.multiply(error_h, Matrix.transpose(inputs));
+    var delta_w_ih = Matrix.multiply(gradient_ih, Matrix.transpose(inputs));
 
     //Multipling by learning rate
     delta_w_ih.multiplyscaler(this.learning_rate);
@@ -121,10 +117,6 @@ function Nn(inputno, hiddenno, outputno)
     //Changing the biases in the hidden layer
     gradient_ih.multiplyscaler(this.learning_rate);
     this.bias_h = Matrix.add(this.bias_h, gradient_ih);
-
-    //Displaying changes
-    this.weights_ih.print();
-    this.weights_ho.print();
   }
 
   //Function to predict given neural network
