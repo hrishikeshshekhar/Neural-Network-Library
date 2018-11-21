@@ -1,11 +1,14 @@
 let training_data;
 let nn;
+let learning_rate = 0.01;
+let size = 800;
+let resol = 20;
 
 function setup()
 {
-  createCanvas(400, 400);
-  nn = new Nn(2, 8, 1);
-  nn.setup();
+  createCanvas(800, 800);
+  nn = new Nn(2, 20, 1);
+  nn.setup(learning_rate);
 
   training_data = [
     {
@@ -36,7 +39,6 @@ function draw()
     nn.train(data.input, data.output);
   }
 
-  let resol = 20;
   let cols = width / resol;
   let rows = width / resol;
   for(let x = 0; x < rows; ++x)

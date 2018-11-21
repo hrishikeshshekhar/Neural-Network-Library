@@ -9,7 +9,7 @@ function Nn(inputno, hiddenno, outputno)
   this.bias_h;
   this.bias_o;
 
-  this.setup = function()
+  this.setup = function(learning_rate)
   {
     this.weights_ih = new Matrix(this.hidden_nodes, this.input_nodes);
     this.weights_ih.setup();
@@ -19,6 +19,7 @@ function Nn(inputno, hiddenno, outputno)
     this.bias_h.setup();
     this.bias_o = new Matrix(this.output_nodes, 1);
     this.bias_o.setup();
+    this.learning_rate = learning_rate;
   }
 
   this.feedforward = function(inputs)
