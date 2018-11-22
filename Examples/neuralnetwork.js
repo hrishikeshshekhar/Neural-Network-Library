@@ -8,15 +8,9 @@ function Nn(inputno, hiddenno, outputno)
   this.weights_ho;
   this.bias_h;
   this.bias_o;
-  this.weight_prev_ih;
-  this.weight_prev_ho;
-  this.bias_prev_h;
-  this.bias_prev_o;
-  this.momentum = 0.5;
 
-  this.setup = function(learning_rate, momentum)
+  this.setup = function(learning_rate)
   {
-    //Initializing the weights
     this.weights_ih = new Matrix(this.hidden_nodes, this.input_nodes);
     this.weights_ih.setup();
     this.weights_ho = new Matrix(this.output_nodes, this.hidden_nodes);
@@ -25,20 +19,7 @@ function Nn(inputno, hiddenno, outputno)
     this.bias_h.setup();
     this.bias_o = new Matrix(this.output_nodes, 1);
     this.bias_o.setup();
-
-    //Setting the learning rate and momentum rate
     this.learning_rate = learning_rate;
-    this.momentum      = momentum;
-
-    //Creating storage for momentum variables
-    this.weight_prev_ih = new Matrix(this.hidden_nodes, this.input_nodes);
-    this.weight_prev_ih.setup();
-    this.weight_prev_ho = new Matrix(this.hidden_nodes, this.input_nodes);
-    this.weight_prev_ho.setup();
-    this.bias_prev_h = new Matrix(this.hidden_nodes);
-    this.bias_prev_h.setup();
-    this.bias_prev_o = new Matrix(this.output_nodes);
-    this.bias_prev_o.setup();
   }
 
   this.feedforward = function(inputs)
@@ -52,14 +33,12 @@ function Nn(inputno, hiddenno, outputno)
     //Generating the hidden layer output
     output = Matrix.multiply(this.weights_ih, inputs);
     output = Matrix.add(output, this.bias_h);
-
     //Passing output through activation function
     output.activate();
 
     //Generating the final output
     output = Matrix.multiply(this.weights_ho, output);
     output = Matrix.add(output, this.bias_o);
-
     //Passing output through activation function
     output.activate();
 
@@ -118,53 +97,27 @@ function Nn(inputno, hiddenno, outputno)
     outputs.activateder();
     var gradient_ho = Matrix.hadmardproduct(outputs, error_o);
     var delta_w_ho = Matrix.multiply(gradient_ho, Matrix.transpose(hidden_inputs));
-    
+
     //Multiplying the change by learning rate
     delta_w_ho.multiplyscaler(this.learning_rate);
-    gradient_ho.multiplyscaler(this.learning_rate);
-
-    //Computing momentum change
-    var momentum_change_weights_ho = this.weight_prev_ho.multiplyscaler(this.momentum);
-    var momentum_change_bias_o     = this.bias_prev_o.multiplyscaler(this.momentum); 
-    
-    //Applying gradient descent
     this.weights_ho = Matrix.add(this.weights_ho, delta_w_ho);
-    this.bias_o     = Matrix.add(this.bias_o, gradient_ho);
 
-    //Applying momentum
-    this.weights_ho = Matrix.add(this.weights_ho, momentum_change_weights_ho);
-    this.bias_o     = Matrix.add(this.bias_o, momentum_change_bias_o);
+    //Changing the biases in the output layer
+    gradient_ho.multiplyscaler(this.learning_rate);
+    this.bias_o = Matrix.add(this.bias_o, gradient_ho);
 
-    //Updating the previous weights
-    this.weight_prev_ho = this.weights_ho;
-    this.bias_prev_o    = this.bias_o;
-    
     //Computing the change in weights of the input layer
     hidden_inputs.activateder();
-    
-    //Finding gradients in input hidden layer
     var gradient_ih = Matrix.hadmardproduct(hidden_inputs, error_h);
-    var delta_w_ih  = Matrix.multiply(gradient_ih, Matrix.transpose(inputs));
+    var delta_w_ih = Matrix.multiply(gradient_ih, Matrix.transpose(inputs));
 
-    //Computing momentum change in input hidden layer
-    var momentum_change_weights_ih = this.weight_prev_ih.multiplyscaler(this.momentum);
-    var momentum_change_bias_h     = this.bias_prev_h.multiplyscaler(this.momentum);
-
-    //Multiplying by learning rate
+    //Multipling by learning rate
     delta_w_ih.multiplyscaler(this.learning_rate);
-    gradient_ih.multiplyscaler(this.learning_rate);
-    
-    //Applying gradient descent    
     this.weights_ih = Matrix.add(this.weights_ih, delta_w_ih);
-    this.bias_h     = Matrix.add(this.bias_h, gradient_ih);
-    
-    //Applying momentum
-    this.weights_h = Matrix.add(this.weights_ih, momentum_change_weights_ih);
-    this.bias_h    = Matrix.add(this.bias_h, momentum_change_bias_h);
 
-    //Updating the previous weights
-    this.weight_prev_ih = this.weights_ih;
-    this.bias_prev_h    = this.bias_o;
+    //Changing the biases in the hidden layer
+    gradient_ih.multiplyscaler(this.learning_rate);
+    this.bias_h = Matrix.add(this.bias_h, gradient_ih);
   }
 
   //Function to predict given neural network

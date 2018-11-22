@@ -25,7 +25,6 @@ function Matrix(rows, cols)
   }
 
   //Function to add 2 martices and return in a third matrix
-  //Assuming they have same number of rows and cols
   Matrix.add = function(a, b)
   {
     var result = new Matrix(a.rows, a.cols);

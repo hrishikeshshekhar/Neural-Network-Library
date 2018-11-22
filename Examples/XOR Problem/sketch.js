@@ -1,6 +1,7 @@
 let training_data;
 let nn;
 let learning_rate = 0.01;
+let momentum_rate = 0.50;
 let size = 800;
 let resol = 20;
 
@@ -8,7 +9,7 @@ function setup()
 {
   createCanvas(800, 800);
   nn = new Nn(2, 20, 1);
-  nn.setup(learning_rate);
+  nn.setup(learning_rate, momentum_rate);
 
   training_data = [
     {
@@ -49,6 +50,7 @@ function draw()
       let x2 = y / cols;
       let inputs = [x1, x2];
       let r = nn.predict(inputs);
+      //console.log(r);
       fill(r * 255);
       rect(x * resol, y * resol, resol, resol);
     }
