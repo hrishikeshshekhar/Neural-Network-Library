@@ -3,7 +3,7 @@ function Nn(inputno, hiddenno, outputno)
   this.input_nodes = inputno;
   this.hidden_nodes = hiddenno;
   this.output_nodes = outputno;
-  this.learning_rate = 0.01;
+  this.learning_rate = 0.1;
   this.weights_ih;
   this.weights_ho;
   this.bias_h;

@@ -50,7 +50,6 @@ function draw()
       let x2 = y / cols;
       let inputs = [x1, x2];
       let r = nn.predict(inputs);
-      //console.log(r);
       fill(r * 255);
       rect(x * resol, y * resol, resol, resol);
     }
